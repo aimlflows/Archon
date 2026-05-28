@@ -57,7 +57,7 @@ class TaskService:
         project_id: str,
         title: str,
         description: str = "",
-        assignee: str = "User",
+        assignee: str = "GK",
         task_order: int = 0,
         priority: str = "medium",
         feature: str | None = None,

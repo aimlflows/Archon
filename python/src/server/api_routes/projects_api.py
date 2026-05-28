@@ -69,7 +69,7 @@ class CreateTaskRequest(BaseModel):
     title: str
     description: str | None = None
     status: str | None = "todo"
-    assignee: str | None = "User"
+    assignee: str | None = "GK"
     task_order: int | None = 0
     priority: str | None = "medium"
     feature: str | None = None

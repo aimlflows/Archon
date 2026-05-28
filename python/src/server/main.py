@@ -34,6 +34,12 @@ from .api_routes.version_api import router as version_router
 # Import modular API routers
 from .api_routes.settings_api import router as settings_router
 
+# Agile PM routers (KYROS Phase 2)
+from .api_routes.backlog_api import router as backlog_router
+from .api_routes.dependencies_api import router as dependencies_router
+from .api_routes.epics_api import router as epics_router
+from .api_routes.sprints_api import router as sprints_router
+
 # Import Logfire configuration
 from .config.logfire_config import api_logger, setup_logfire
 from .services.crawler_manager import cleanup_crawler, initialize_crawler
@@ -194,6 +200,12 @@ app.include_router(bug_report_router)
 app.include_router(providers_router)
 app.include_router(version_router)
 app.include_router(migration_router)
+
+# Agile PM routers (KYROS Phase 2)
+app.include_router(backlog_router)
+app.include_router(dependencies_router)
+app.include_router(epics_router)
+app.include_router(sprints_router)
 
 
 # Root endpoint
