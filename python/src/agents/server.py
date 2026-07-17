@@ -26,6 +26,8 @@ from pydantic import BaseModel
 # Import our PydanticAI agents
 from .document_agent import DocumentAgent
 from .rag_agent import RagAgent
+# NETRA Phase 5B Slice 1 — droid job runner (background poll of Archon tasks)
+from . import droid_runner
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -133,10 +135,18 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"Failed to initialize {name} agent: {e}")
 
+    # Kick off the droid job runner as a background asyncio task.
+    # Env-gated so we can flip it off without editing the image.
+    if os.getenv("DROID_RUNNER_ENABLED", "true").lower() == "true":
+        droid_runner.start_background_runner()
+    else:
+        logger.info("Droid runner disabled via DROID_RUNNER_ENABLED=false")
+
     yield
 
     # Cleanup
     logger.info("Shutting down Agents service...")
+    droid_runner.stop_background_runner()
 
 
 # Create FastAPI app
@@ -192,6 +202,14 @@ async def run_agent(request: AgentRequest):
     except Exception as e:
         logger.error(f"Error running {request.agent_type} agent: {e}")
         return AgentResponse(success=False, error=str(e))
+
+
+@app.post("/droid-runner/tick")
+async def droid_runner_tick():
+    """Manual trigger: run one poll pass through todo droid tasks.
+    Handy for tests + demos when you don't want to wait for the schedule."""
+    await droid_runner.trigger_tick_once()
+    return {"status": "ok", "note": "single tick executed"}
 
 
 @app.get("/agents/list")

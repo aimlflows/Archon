@@ -39,6 +39,8 @@ from .api_routes.backlog_api import router as backlog_router
 from .api_routes.dependencies_api import router as dependencies_router
 from .api_routes.epics_api import router as epics_router
 from .api_routes.sprints_api import router as sprints_router
+# NETRA Phase 5B Slice 1 — droid factory workflow persistence
+from .api_routes.workflow_runs_api import router as workflow_runs_router
 
 # Import Logfire configuration
 from .config.logfire_config import api_logger, setup_logfire
@@ -206,6 +208,9 @@ app.include_router(backlog_router)
 app.include_router(dependencies_router)
 app.include_router(epics_router)
 app.include_router(sprints_router)
+
+# NETRA Phase 5B Slice 1 — droid factory workflow persistence
+app.include_router(workflow_runs_router)
 
 
 # Root endpoint
