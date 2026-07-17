@@ -1,8 +1,10 @@
-import { Tag } from "lucide-react";
+import { Bot, Tag } from "lucide-react";
 import type React from "react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { isOptimistic } from "@/features/shared/utils/optimistic";
+// NETRA Phase 5B Slice 2.1b — HITL review panel
+import { ReviewGatePanel } from "../../../droids/components/ReviewGatePanel";
 import { Card } from "../../../ui/primitives";
 import { OptimisticIndicator } from "../../../ui/primitives/OptimisticIndicator";
 import { cn } from "../../../ui/primitives/styles";
@@ -40,6 +42,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
   // Check if task is optimistic
   const optimistic = isOptimistic(task);
+
+  // NETRA Phase 5B Slice 2.1b — Review gate for droid work
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const isDroidReview =
+    task.status === "review" && (task.assignee || "").startsWith("kio-");
 
   // Use business logic hook with changePriority
   const { changeAssignee, changePriority, isUpdating } = useTaskActions(projectId);
@@ -179,6 +186,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             {/* Optimistic indicator */}
             <OptimisticIndicator isOptimistic={optimistic} className="ml-auto" />
 
+            {/* NETRA Slice 2.1b — HITL review-gate trigger on droid cards */}
+            {isDroidReview && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setReviewOpen(true);
+                }}
+                className="flex items-center gap-1 rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-purple-200 hover:bg-purple-500/40 transition"
+                title="Open HITL review — approve / reject / redirect"
+              >
+                <Bot className="w-3 h-3" />
+                Review
+              </button>
+            )}
+
             {/* Action buttons group */}
             <div className={cn("flex items-center gap-1.5", !optimistic && "ml-auto")}>
               <TaskCardActions
@@ -227,6 +250,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         </div>
       </Card>
+
+      {/* NETRA Slice 2.1b — HITL review modal (mounted only when opened) */}
+      {reviewOpen && (
+        <ReviewGatePanel
+          isOpen={reviewOpen}
+          onClose={() => setReviewOpen(false)}
+          task={task}
+          projectId={projectId}
+        />
+      )}
     </div>
   );
 };
